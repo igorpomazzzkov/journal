@@ -10,6 +10,7 @@ import {
     AlertIcon,
     AlertDescription,
 } from "@chakra-ui/react"
+import UserService from '../service/user-service'
 
 class Login extends Component {
 
@@ -56,6 +57,23 @@ class Login extends Component {
         })
     }
 
+    handleKeyPress = (e) => {
+        if(e.code === 'Enter'){
+            this.handleLogin(e)
+        }
+        if(e.code === 'ArrowDown' || e.code === 'ArrowUp'){
+            this.setFocus(document.activeElement.id)
+        }
+    }
+
+    setFocus(id){
+        if(id === 'username'){
+            document.getElementById('password').focus()
+        } else {
+            document.getElementById('username').focus()
+        }
+    }
+
     handleLogin(e) {
         this.setState({
             isLoading: true
@@ -63,8 +81,12 @@ class Login extends Component {
         const {dispatch, history} = this.props;
         dispatch(login(this.state.username, this.state.password))
             .then(() => {
+                UserService.getActiveUser().then((data) =>{
+                    console.log(data)
+                    localStorage.setItem('user', JSON.stringify(data))
+                    window.location.reload()
+                })
                 history.push('/')
-                window.location.reload()
             })
             .catch(() => {
                 this.setState({
@@ -93,6 +115,7 @@ class Login extends Component {
                     <Input size="sm" type="text" onChange={this.onChangeUsername}
                            isInvalid={message}
                            placeholder="Phone or Email"
+                           onKeyDown={(e) => this.handleKeyPress(e)}
                            focusBorderColor="dimgray"/>
                     <FormHelperText>Вы можете ввести email или мобильный телефон</FormHelperText>
                 </FormControl>
@@ -108,12 +131,15 @@ class Login extends Component {
                         <Input size="sm"
                                onChange={this.onChangePassword}
                                placeholder="Password"
+                               id="password"
+                               onKeyDown={(e) => this.handleKeyPress(e)}
                                type={this.state.isShowPassword ? 'text' : 'password'}
                                focusBorderColor="dimgray"/>
                     </InputGroup>
                 </FormControl>
                 <Stack direction="row" spacing={4} align="left">
                     <Button bg="tomato" color="white" focusBorderColor="tomato" isLoading={this.state.isLoading}
+
                             onClick={this.handleLogin}
                             varian="solid">Войти</Button>
                     <Button focusBorderColor="tomato" variant="ghost">
