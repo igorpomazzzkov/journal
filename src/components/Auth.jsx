@@ -4,12 +4,17 @@ import {Route, Switch, useRouteMatch} from "react-router-dom"
 import Registration from "./Registration"
 import Login from './Login'
 import {useMediaQuery} from "@chakra-ui/react"
+import { Redirect } from 'react-router-dom'
 
 const Auth = () => {
     let {path} = useRouteMatch();
     const [isDisplayingInBrowser] = useMediaQuery([
         "(min-width: 1020px)",
     ])
+
+    if(localStorage.getItem('credentials')){
+        <Redirect to="/home"/>
+    }
 
     return (
         <Grid h="100vh" templateColumns={isDisplayingInBrowser ? "repeat(2, 1fr)" : "repeat(1, 1fr)"}>

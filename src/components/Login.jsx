@@ -10,7 +10,6 @@ import {
     AlertIcon,
     AlertDescription,
 } from "@chakra-ui/react"
-import UserService from '../service/user-service'
 
 class Login extends Component {
 
@@ -81,12 +80,8 @@ class Login extends Component {
         const {dispatch, history} = this.props;
         dispatch(login(this.state.username, this.state.password))
             .then(() => {
-                UserService.getActiveUser().then((data) =>{
-                    console.log(data)
-                    localStorage.setItem('user', JSON.stringify(data))
-                    window.location.reload()
-                })
-                history.push('/')
+                window.location.reload()
+                history.push('/home')
             })
             .catch(() => {
                 this.setState({
@@ -99,7 +94,7 @@ class Login extends Component {
         const {isLoggedIn, message} = this.props;
 
         if (isLoggedIn) {
-            return <Redirect to="/"/>
+            return <Redirect to="/home"/>
         }
 
         return (

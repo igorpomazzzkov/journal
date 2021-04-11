@@ -18,8 +18,7 @@ class AuthService {
             .post('/auth/logout', { "token": token })
             .then((response) => {
                 if (response.status === 204) {
-                    localStorage.removeItem('credentials')
-                    localStorage.removeItem('user')
+                    localStorage.clear();
                     return true
                 }
                 return false

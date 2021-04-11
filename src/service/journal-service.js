@@ -1,9 +1,16 @@
 import axios from '../api'
+import {authHeader} from './auth-header'
 
 class JournalService {
-    getJournalsByTeacherId() {
-        let teacherId = JSON.parse(localStorage.getItem('user')).id
-        return axios.get("/journals", {teacherId}).then((response) => {
+    getJournalsByTeacherId(teacherId) {
+        const params = {
+            teacherId: teacherId
+        }
+        return axios.get("/journals", {
+            headers: authHeader(),
+            params: params
+        }).then((response) => {
+            
             return response.data
         })
     }

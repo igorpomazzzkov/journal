@@ -1,12 +1,12 @@
 import './index.css'
-import {Route, BrowserRouter, Switch} from 'react-router-dom'
+import { Route, BrowserRouter, Switch } from 'react-router-dom'
 import Main from './components/Main'
-import NotFound from './components/NotFound'
-import {ChakraProvider} from "@chakra-ui/react"
+import { ChakraProvider } from "@chakra-ui/react"
 import Auth from "./components/Auth";
-import {history} from "./settings/history";
-import {clearMessage} from "./actions/message";
-import { connect } from "react-redux";
+import { history } from "./settings/history";
+import { clearMessage } from "./actions/message";
+import { connect } from "react-redux"
+import NotFound from './components/NotFound'
 
 function App(props) {
 
@@ -18,9 +18,9 @@ function App(props) {
         <ChakraProvider>
             <BrowserRouter>
                 <Switch>
-                    <Route exact path="/" component={Main}/>
-                    <Route path="/auth" component={Auth}/>
-                    <Route path="**" component={NotFound}/>
+                    <Route path="/" component={Main} />
+                    <Route path="/auth" component={Auth} />
+                    <Route path="**" component={NotFound} />
                 </Switch>
             </BrowserRouter>
         </ChakraProvider>
