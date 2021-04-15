@@ -1,16 +1,13 @@
 import React from 'react'
-
-import AddUserDialog from './AddSubject'
 import clsx from 'clsx'
 import DeleteIcon from '@material-ui/icons/Delete'
 import GlobalFilter from './GlobalFilter'
 import IconButton from '@material-ui/core/IconButton'
 import { lighten, makeStyles } from '@material-ui/core/styles'
-import PropTypes from 'prop-types'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import Tooltip from '@material-ui/core/Tooltip'
-import AddSubject from './AddSubject'
+import AddGroup from './AddJournal'
 
 const useToolbarStyles = makeStyles(theme => ({
   root: {
@@ -40,8 +37,8 @@ const TableToolbar = props => {
   const classes = useToolbarStyles()
   const {
     numSelected,
-    addHandler,
-    deleteUserHandler,
+    addData,
+    deleteData,
     preGlobalFilteredRows,
     setGlobalFilter,
     globalFilter,
@@ -53,7 +50,7 @@ const TableToolbar = props => {
         [classes.highlight]: numSelected > 0,
       })}
     >
-      <AddSubject addHandler={addHandler} className={classes.add} />
+      <AddGroup addData={addData} className={classes.add} />
       {numSelected > 0 ? (
         <Typography
           margin="dense"
@@ -70,7 +67,7 @@ const TableToolbar = props => {
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton aria-label="delete" onClick={deleteUserHandler}>
+          <IconButton aria-label="delete" onClick={deleteData}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>

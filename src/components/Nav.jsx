@@ -81,10 +81,10 @@ class Nav extends Component {
                                     color="white"
                                     mt="4"
                                     rounded="md">
-                                    <Link m="5px" color="gray.600" href="/journals">Журналы</Link>
-                                    <Link m="5px" color="gray.600" href="/students">Студенты</Link>
-                                    <Link m="5px" color="gray.600" href="/groups">Группы</Link>
-                                    <Link m="5px" color="gray.600" href="/subjects">Дисциплины</Link>
+                                    <Link m="5px" color="gray.600" href="/home/journals">Журналы</Link>
+                                    <Link m="5px" color="gray.600" href="/home/students">Студенты</Link>
+                                    <Link m="5px" color="gray.600" href="/home/groups">Группы</Link>
+                                    <Link m="5px" color="gray.600" href="/home/subjects">Дисциплины</Link>
                                 </Box>
                             </Collapse>
                         </Box>

@@ -12,10 +12,6 @@ const Auth = () => {
         "(min-width: 1020px)",
     ])
 
-    if(localStorage.getItem('credentials')){
-        <Redirect to="/home"/>
-    }
-
     return (
         <Grid h="100vh" templateColumns={isDisplayingInBrowser ? "repeat(2, 1fr)" : "repeat(1, 1fr)"}>
             {isDisplayingInBrowser ?

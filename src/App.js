@@ -18,7 +18,7 @@ function App(props) {
         <ChakraProvider>
             <BrowserRouter>
                 <Switch>
-                    <Route path="/" component={Main} />
+                    <Route path="/home" component={Main} />
                     <Route path="/auth" component={Auth} />
                     <Route path="**" component={NotFound} />
                 </Switch>

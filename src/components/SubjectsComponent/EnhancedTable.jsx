@@ -20,11 +20,12 @@ import {
   useSortBy,
   useTable,
 } from 'react-table'
+import SubjectService from '../../service/subject-service'
 
 
 const useTableStyles = makeStyles(theme => ({
   pagination: {
-    width: "100%" 
+    width: "100%"
   },
   footer_row: {
     width: "100%"
@@ -101,7 +102,7 @@ EditableCell.propTypes = {
     index: PropTypes.number.isRequired,
   }),
   column: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
   }),
   updateMyData: PropTypes.func.isRequired,
 }
@@ -189,17 +190,23 @@ const EnhancedTable = ({
   const removeByIndexs = (array, indexs) =>
     array.filter((_, i) => !indexs.includes(i))
 
-  const deleteUserHandler = event => {
+  const getRemovingElements = (array, indexs) => 
+    array.filter((_, i) => indexs.includes(i))
+
+  const deleteData = event => {
     const newData = removeByIndexs(
       data,
       Object.keys(selectedRowIds).map(x => parseInt(x, 10))
     )
+    let ids = getRemovingElements(data, Object.keys(selectedRowIds).map(x => parseInt(x, 10))).map((item) => {
+      return item.id
+    })
+    SubjectService.deleteSubjects(ids)
     setData(newData)
   }
 
-  const addHandler = (data) => {
-    console.log(data)
-    const newData = data.concat([data])
+  const addData = (subject) => {
+    const newData = data.concat([subject])
     setData(newData)
   }
 
@@ -208,8 +215,8 @@ const EnhancedTable = ({
     <TableContainer>
       <TableToolbar
         numSelected={Object.keys(selectedRowIds).length}
-        deleteUserHandler={deleteUserHandler}
-        addHandler={addHandler}
+        deleteData={deleteData}
+        addData={addData}
         preGlobalFilteredRows={preGlobalFilteredRows}
         setGlobalFilter={setGlobalFilter}
         name={name}
@@ -282,14 +289,6 @@ const EnhancedTable = ({
       </MaUTable>
     </TableContainer>
   )
-}
-
-EnhancedTable.propTypes = {
-  columns: PropTypes.array.isRequired,
-  data: PropTypes.array.isRequired,
-  updateMyData: PropTypes.func.isRequired,
-  setData: PropTypes.func.isRequired,
-  skipPageReset: PropTypes.bool.isRequired,
 }
 
 export default EnhancedTable

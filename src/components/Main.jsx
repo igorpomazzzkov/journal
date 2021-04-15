@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Grid, GridItem, Box, Flex, useMediaQuery, useDisclosure } from '@chakra-ui/react'
+import { Grid, GridItem, Box, useMediaQuery, useDisclosure } from '@chakra-ui/react'
 import { Redirect } from 'react-router-dom'
 import Nav from './Nav'
 import { connect } from 'react-redux'
@@ -21,15 +21,18 @@ const Main = (props) => {
 
     const { isOpen, onOpen, onClose } = useDisclosure()
     const history = useHistory();
+    const { isLoggedIn, dispatch } = props;
     useEffect(() => {
-        UserService.getActiveUser().then(() => {
-            JournalService.getJournalsByTeacherId(JSON.parse(localStorage.getItem('user')).id).then((data) => {
-                setJournals(data)
+        if (isLoggedIn) {
+            UserService.getActiveUser().then(() => {
+                JournalService.getJournalsByTeacherId(JSON.parse(localStorage.getItem('user')).id).then((data) => {
+                    setJournals(data)
+                })
             })
-        })
+        }
     }, [])
 
-    const { isLoggedIn, dispatch } = props;
+
     if (!isLoggedIn) {
         return <Redirect to="/auth" />
     }
@@ -56,7 +59,7 @@ const Main = (props) => {
                 </Box>
             </GridItem>}
             {!isDisplayingInBrowser &&
-                <Box px="5" pt="5">
+                <Box px="20px">
                     <IconButton size="lg"
                         onClick={onOpen}
                         aria-label="Search"
@@ -71,7 +74,8 @@ const Main = (props) => {
                                     isTeacher={isTeacher}
                                     isStudent={isStudent}
                                     journals={journals}
-                                    dispatch={dispatch} user={user} />
+                                    dispatch={dispatch}
+                                    user={user} />
                             </DrawerContent>
                         </DrawerOverlay>
                     </Drawer>

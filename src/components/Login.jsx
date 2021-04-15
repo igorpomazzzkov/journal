@@ -80,7 +80,7 @@ class Login extends Component {
         const {dispatch, history} = this.props;
         dispatch(login(this.state.username, this.state.password))
             .then(() => {
-                window.location.reload()
+                
                 history.push('/home')
             })
             .catch(() => {

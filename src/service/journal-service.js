@@ -14,6 +14,12 @@ class JournalService {
             return response.data
         })
     }
+
+    getAllJournals(){
+        return axios.get('/journals', {headers: authHeader()}).then((response) => {
+            return response.data
+        })
+    }
 }
 
 

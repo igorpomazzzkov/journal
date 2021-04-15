@@ -22,9 +22,7 @@ const Header = (props) => {
 
     const logout = () => {
         const { history, dispatch } = props;
-        dispatch(log()).then(() => {
-            history.push('/auth')
-        })
+        dispatch(log())
     }
 
     const logout_key = (e) => {

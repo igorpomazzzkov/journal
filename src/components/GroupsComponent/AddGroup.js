@@ -9,15 +9,16 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import IconButton from '@material-ui/core/IconButton'
 import TextField from '@material-ui/core/TextField'
 import Tooltip from '@material-ui/core/Tooltip'
+import GroupService from '../../service/group-service'
 
-const initialSubject = {
+const initial = {
   name: '',
-  shortName: ''
+  course: ''
 }
 
-const AddSubject = props => {
-  const [subject, setSubject] = useState(initialSubject)
-  const { addHanler } = props
+const AddGroup = props => {
+  const [group, setGroup] = useState(initial)
+  const { addData } = props
   const [open, setOpen] = React.useState(false)
 
   const handleClickOpen = () => {
@@ -28,14 +29,16 @@ const AddSubject = props => {
     setOpen(false)
   }
 
-  const subjectHandler = (event) => {
-    console.log(subject)
-    addHanler(subject)
-    setSubject(initialSubject)
+  const handler = (event) => {
+    GroupService.addGroup(group).then((data) => {
+      addData(data)
+      setGroup(initial)
+      handleClose()
+    })
   }
 
   const handleChange = name => ({ target: { value } }) => {
-    setSubject({ ...subject, [name]: value })
+    setGroup({ ...group, [name]: value })
   }
 
   return (
@@ -50,7 +53,7 @@ const AddSubject = props => {
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle id="form-dialog-title">Добавление дисциплины</DialogTitle>
+        <DialogTitle id="form-dialog-title">Добавление группы</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -58,23 +61,23 @@ const AddSubject = props => {
             label="Наименование"
             type="text"
             fullWidth
-            value={subject.name}
+            value={group.name}
             onChange={handleChange('name')}
           />
           <TextField
             margin="dense"
-            label="Краткое имя"
-            type="text"
+            label="Курс"
+            type="email"
             fullWidth
-            value={subject.shortName}
-            onChange={handleChange('shortName')}
+            value={group.course}
+            onChange={handleChange('course')}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={subjectHandler} color="primary">
+          <Button onClick={handler} color="primary">
             Add
           </Button>
         </DialogActions>
@@ -83,4 +86,4 @@ const AddSubject = props => {
   )
 }
 
-export default AddSubject
+export default AddGroup

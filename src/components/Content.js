@@ -1,8 +1,10 @@
 import React from 'react'
 import { Route, BrowserRouter, Switch } from 'react-router-dom'
 import MyJournals from './MyJournals'
-import Students from './Students'
-import Subjects from './Subjects'
+import Students from './StudentsComponent/Students'
+import Subjects from './SubjectsComponent/Subjects'
+import Groups from './GroupsComponent/Groups'
+import Journals from './JournalsComponent/Journals'
 import { createMuiTheme } from '@material-ui/core/styles';
 import orange from '@material-ui/core/colors/purple';
 import green from '@material-ui/core/colors/green';
@@ -28,17 +30,25 @@ const Content = (props) => {
                 <Switch>
                     <Route
                         exact
-                        path="/"
+                        path="/home"
                         component={() => <MyJournals props={props} />}
                     />
                     <Route
                         exact
-                        path="/subjects"
+                        path="/home/subjects"
                         component={() => <Subjects />}
                     />
                     <Route
-                        path="/students"
+                        path="/home/students"
                         component={() => <Students />}
+                    />
+                    <Route
+                        path="/home/groups"
+                        component={() => <Groups />}
+                    />
+                    <Route
+                        path="/home/journals"
+                        component={() => <Journals />}
                     />
                 </Switch>
             </BrowserRouter>
