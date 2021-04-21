@@ -1,7 +1,10 @@
 import React from 'react'
 import { Box, Flex, SimpleGrid, Text } from '@chakra-ui/react'
+import { Redirect } from 'react-router';
+import { useHistory } from "react-router-dom";
 
 const MyJournals = (props) => {
+    const history = useHistory();
 
     const lastUpdatedDate = (timestamp) => {
         var date = new Date(timestamp);
@@ -20,7 +23,9 @@ const MyJournals = (props) => {
                         <Box key={journal.id} _hover={{
                             cursor: "pointer",
                             backgroundColor: "rgba(44, 60, 10, 0.1)"
-                        }} borderRadius="20" p="5" bg="whitesmoke">
+                        }} borderRadius="20" p="5" bg="whitesmoke" onClick={() => {
+                            history.push('/home/journals/' + journal.id)
+                        }}>
                             <p>{'Дисциплина: ' + journal.subject.shortName}</p>
                             <p>{'Группа: ' + journal.group.name}</p>
                             <p>{'Дата обновления: ' + lastUpdatedDate(journal.lastUpdated)}</p>

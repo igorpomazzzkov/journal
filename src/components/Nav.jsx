@@ -66,7 +66,7 @@ class Nav extends Component {
                                     mt="4"
                                     rounded="md">
                                     {this.props.journals?.map((journal) =>
-                                        <Link m="5px" key={journal.id} color="gray.600">{journal.group.name + ' ' + journal.subject.shortName}</Link>
+                                        <Link m="5px" href={"/home/journals/" + journal.id} key={journal.id} color="gray.600">{journal.group.name + ' ' + journal.subject.shortName}</Link>
                                     )}
                                 </Box>
                             </Collapse>
@@ -90,7 +90,6 @@ class Nav extends Component {
                         </Box>
                     }
                     <br />
-                    <Button align="start" variant="link">Настройки</Button>
                 </Box>
                 <Spacer />
                 <Box w="100%" d="flex">

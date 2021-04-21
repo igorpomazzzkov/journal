@@ -20,7 +20,7 @@ import {
   useSortBy,
   useTable,
 } from 'react-table'
-import GroupService from '../../service/group-service'
+import JournalService from '../../service/journal-service'
 
 
 const useTableStyles = makeStyles(theme => ({
@@ -201,7 +201,7 @@ const EnhancedTable = ({
     let ids = getRemovingElements(data, Object.keys(selectedRowIds).map(x => parseInt(x, 10))).map((item) => {
       return item.id
     })
-    GroupService.deleteByIds(ids)
+    JournalService.deleteByIds(ids)
     setData(newData)
   }
 

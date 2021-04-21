@@ -54,8 +54,6 @@ const Header = (props) => {
                         size="50" />
                 </MenuButton>
                 <MenuList >
-                    <MenuItem icon={< SettingsIcon />} > Настройки </MenuItem>
-                    <MenuDivider />
                     <MenuItem onClick={logout} > Выход </MenuItem>
                 </MenuList> </Menu> <Modal isOpen={isOpen}
                     onClose={onClose} >
