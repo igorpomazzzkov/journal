@@ -9,7 +9,7 @@ import { createMuiTheme } from '@material-ui/core/styles';
 import orange from '@material-ui/core/colors/purple';
 import green from '@material-ui/core/colors/green';
 import { ThemeProvider } from '@material-ui/styles';
-
+import Journal from './Journal'
 
 const theme = createMuiTheme({
     palette: {
@@ -47,8 +47,13 @@ const Content = (props) => {
                         component={() => <Groups />}
                     />
                     <Route
+                        exact
                         path="/home/journals"
                         component={() => <Journals />}
+                    />
+                    <Route
+                        path="/home/journals/:id"
+                        component={() => <Journal />}
                     />
                 </Switch>
             </BrowserRouter>

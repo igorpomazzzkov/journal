@@ -13,7 +13,6 @@ const Journals = (props) => {
 
     useEffect(() => {
         JournalService.getAllJournals().then((data) => {
-            console.log(data)
             setData(data)
         })
     }, [])

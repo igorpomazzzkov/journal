@@ -13,6 +13,7 @@ import Tooltip from '@material-ui/core/Tooltip'
 import StudentService from '../../service/student-service'
 import GroupService from '../../service/group-service'
 import Select from '@material-ui/core/Select'
+import { FormControl, InputLabel } from '@material-ui/core'
 
 const initial = {
   identifier: '',
@@ -137,6 +138,8 @@ const AddStudent = props => {
             onChange={handleChange('identifier')}
           />
           <br />
+          <FormControl fullWidth>
+          <InputLabel htmlFor="age-native-simple">Выберите группу</InputLabel>
           <Select
             fullWidth
             w="100vw"
@@ -150,6 +153,7 @@ const AddStudent = props => {
               return <MenuItem key={group.id} value={group.id}>{group.name}</MenuItem>
             })}
           </Select>
+          </FormControl>
           <TextField
             autoFocus
             margin="dense"

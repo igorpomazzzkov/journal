@@ -7,7 +7,7 @@ import { lighten, makeStyles } from '@material-ui/core/styles'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import Tooltip from '@material-ui/core/Tooltip'
-import AddGroup from './AddJournal'
+import AddJournal from './AddJournal'
 
 const useToolbarStyles = makeStyles(theme => ({
   root: {
@@ -50,7 +50,7 @@ const TableToolbar = props => {
         [classes.highlight]: numSelected > 0,
       })}
     >
-      <AddGroup addData={addData} className={classes.add} />
+      <AddJournal addData={addData} className={classes.add} />
       {numSelected > 0 ? (
         <Typography
           margin="dense"

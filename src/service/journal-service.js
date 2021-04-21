@@ -20,6 +20,29 @@ class JournalService {
             return response.data
         })
     }
+
+    getJournalInfo(id){
+        return axios.get('/journals/' + id, {headers: authHeader()}).then((response) => {
+            return response.data
+        })
+    }
+
+    getJournalById(id){
+        return axios.get('/journals/', {headers: authHeader(), params: {journalId: id}}).then((response) => {
+            return response.data
+        })
+    }
+
+    addJournal(journal){
+        return axios.post('/journals', journal, {headers: authHeader()}).then((response) => {
+            return response.data
+        })
+    }
+
+    deleteByIds(ids) {
+        console.log(ids)
+        axios.delete('/journals', { headers: authHeader(), params: { ids: ids.toString() } })
+    }
 }
 
 
