@@ -15,7 +15,6 @@ class StudentService {
     }
 
     addStudent(student) {
-        console.log(student)
         return axios.post('/students', student, {headers: authHeader()}).then((response) => {
             return response.data
         })

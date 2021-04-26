@@ -15,14 +15,14 @@ class Journal extends React.Component {
         this.id = window.location.pathname.split('/').pop()
         JournalService.getJournalById(this.id).then((data) => {
             this.setState({ journal: data })
-        })
-        StudentService.getStudentsByGroupId(this.state.journal?.group?.id).then((data) => {
-            this.setState({ students: data })
-            this.setState({
-                rows: data.map((s) => {
-                    return {
-                        student: s.account.lastName + ' ' + s.account.firstName.substring(0, 1) + '. ' + s.account.middleName.substring(0, 1) + '.',
-                    }
+            StudentService.getStudentsByGroupId(data.journal?.group?.id).then((data) => {
+                this.setState({ students: data })
+                this.setState({
+                    rows: data.map((s) => {
+                        return {
+                            student: s.account.lastName + ' ' + s.account.firstName.substring(0, 1) + '. ' + s.account.middleName.substring(0, 1) + '.',
+                        }
+                    })
                 })
             })
         })
@@ -79,29 +79,33 @@ class Journal extends React.Component {
 
     render() {
         return (
-            <Scrollbars style={{ width: "auto", height: "100%" }}>
-                <Flex p="5" flexDirection="column" alignItems="center" justifyContent="start" w="100%" pt="40px">
-                    <Box d="flex" justifyContent="space-between" w="100%" mb="5">
-                        <Text color="gray">Преподаватель: {this.state.journal?.teacher?.lastName + ' ' + this.state.journal?.teacher?.firstName.substring(0, 1) + '. ' + this.state.journal?.teacher?.middleName.substring(0, 1) + '.'}</Text>
-                        <Text color="gray">Дата последнего обновления: {this.state.journal?.lastUpdated}</Text>
-                    </Box>
-                    <ReactDataGrid
-                        width="100vw"
-                        height="150vh"
-                        columns={this.state.columns}
-                        rowGetter={i => this.state.rows[i]}
-                        rowsCount={this.state.students.length}
-                        onGridRowsUpdated={this.onGridRowsUpdated}
-                        enableCellSelect
-                    />
-                </Flex>
-                <Flex justifyContent="space-around">
-                    <Button colorScheme="telegram" variant="ghost" onClick={this.addColumn}>
-                        Добавить занятие
-                </Button>
-                    <Button colorScheme="green" variant="ghost" onClick={this.addColumn}>
-                        Сохранить
-                </Button>
+            <Scrollbars height="100%">
+                <Flex flexDirection="column" h="100%">
+                    <Flex p="5" flexDirection="column" alignItems="center" h="90%" justifyContent="start" w="100%" pt="40px">
+                        <Box d="flex" justifyContent="space-between" w="100%" mb="5">
+                            <Text color="gray">Преподаватель: {this.state.journal?.teacher?.lastName + ' ' + this.state.journal?.teacher?.firstName.substring(0, 1) + '. ' + this.state.journal?.teacher?.middleName.substring(0, 1) + '.'}</Text>
+                            <Text color="gray">Дата последнего обновления: {this.state.journal?.lastUpdated}</Text>
+                        </Box>
+                        <ReactDataGrid
+                            minHeight={660}
+                            style="border: 1px solid red"
+                            width="100vw"
+                            h="100%"
+                            columns={this.state.columns}
+                            rowGetter={i => this.state.rows[i]}
+                            rowsCount={this.state.students.length}
+                            onGridRowsUpdated={this.onGridRowsUpdated}
+                            enableCellSelect
+                        />
+                    </Flex>
+                    <Flex justifyContent="space-around">
+                        <Button colorScheme="telegram" variant="ghost" onClick={this.addColumn}>
+                            Добавить занятие
+                    </Button>
+                        <Button colorScheme="green" variant="ghost" onClick={this.addColumn}>
+                            Сохранить
+                    </Button>
+                    </Flex>
                 </Flex>
             </Scrollbars>
         )
