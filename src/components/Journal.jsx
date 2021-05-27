@@ -8,15 +8,22 @@ import ReactDataGrid from "react-data-grid";
 
 class Journal extends React.Component {
 
+    state = {
+        info: [],
+        journal: {},
+        students: [],
+        columns: [],
+        rows: [],
+    }
+
     constructor(props) {
         super(props)
         this.onGridRowsUpdated = this.onGridRowsUpdated.bind(this)
         this.addColumn = this.addColumn.bind(this)
         this.id = window.location.pathname.split('/').pop()
-        JournalService.getJournalById(this.id).then((data) => {
-            this.setState({ journal: data })
-            StudentService.getStudentsByGroupId(data.journal?.group?.id).then((data) => {
-                this.setState({ students: data })
+        JournalService.getJournalById(this.id).then((response) => {
+            this.setState({ journal: response })
+            StudentService.getStudentsByGroupId(response.group.id).then((data) => {
                 this.setState({
                     rows: data.map((s) => {
                         return {
@@ -40,24 +47,12 @@ class Journal extends React.Component {
                 this.setState({
                     columns: [...this.state.columns, { key: i.date, name: date, enabled: true }]
                 })
-                console.log(this.state.columns)
                 this.setState({rows: data})
-                console.log(this.state.rows)
-                console.log(this.state.rows[i.student.id])
             })
-            
         })
-
-        
     }
 
-    state = {
-        info: [],
-        journal: {},
-        students: [],
-        columns: [],
-        rows: [],
-    }
+    
 
     onGridRowsUpdated({ fromRow, toRow, updated }) {
         this.setState(state => {
@@ -92,8 +87,8 @@ class Journal extends React.Component {
                             width="100vw"
                             h="100%"
                             columns={this.state.columns}
-                            rowGetter={i => this.state.rows[i]}
-                            rowsCount={this.state.students.length}
+                            rowGetter={i => this.state.rows.indexOf(i)}
+                            rowsCount={this.state.rows.length}
                             onGridRowsUpdated={this.onGridRowsUpdated}
                             enableCellSelect
                         />

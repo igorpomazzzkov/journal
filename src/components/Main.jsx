@@ -10,7 +10,6 @@ import JournalService from '../service/journal-service'
 import { Drawer, DrawerContent, IconButton, DrawerOverlay } from '@chakra-ui/react'
 import { HamburgerIcon } from '@chakra-ui/icons'
 import Loader from './Loader'
-import { useHistory } from 'react-router-dom'
 
 const Main = (props) => {
 
@@ -20,7 +19,6 @@ const Main = (props) => {
     ])
 
     const { isOpen, onOpen, onClose } = useDisclosure()
-    const history = useHistory();
     const { isLoggedIn, dispatch } = props;
     useEffect(() => {
         if (isLoggedIn) {

@@ -9,13 +9,14 @@ class StudentService {
     }
 
     getStudentsByGroupId(id){
-        return axios.get('/students', {headers: authHeader(), params: {groupId: id}}).then((response) => {
+        return axios.get('/students', {headers: authHeader(), params: {groupId: id} }).then((response) => {
             return response.data
         })
     }
 
     addStudent(student) {
         return axios.post('/students', student, {headers: authHeader()}).then((response) => {
+            console.log(response.data)
             return response.data
         })
     }
