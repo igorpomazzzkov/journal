@@ -1,110 +1,151 @@
-import React, { useState, useEffect } from 'react'
-import { Box, Flex, Text, Button } from '@chakra-ui/react'
-import { Scrollbars } from 'react-custom-scrollbars'
+import React, {useEffect, useState} from 'react'
+import {Box, Button, Flex, Text} from '@chakra-ui/react'
+import {Scrollbars} from 'react-custom-scrollbars'
 import JournalService from '../service/journal-service'
 import StudentService from '../service/student-service'
-import Loader from './Loader';
-import ReactDataGrid from "react-data-grid";
+import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
+import {makeStyles} from '@material-ui/core/styles';
 
-class Journal extends React.Component {
+const Journal = () => {
 
-    state = {
-        info: [],
-        journal: {},
-        students: [],
-        columns: [],
-        rows: [],
-    }
+    const [info, setInfo] = useState(null)
+    const [journal, setJournal] = useState(null)
+    const [students, setStudents] = useState([])
+    const [columns, setColumns] = useState([])
+    const [rows, setRows] = useState([])
+    const [id, setId] = useState(window.location.pathname.split('/').pop())
 
-    constructor(props) {
-        super(props)
-        this.onGridRowsUpdated = this.onGridRowsUpdated.bind(this)
-        this.addColumn = this.addColumn.bind(this)
-        this.id = window.location.pathname.split('/').pop()
-        JournalService.getJournalById(this.id).then((response) => {
-            this.setState({ journal: response })
+    useEffect(() => {
+        JournalService.getJournalById(id).then((response) => {
+            setJournal(response)
             StudentService.getStudentsByGroupId(response.group.id).then((data) => {
-                this.setState({
-                    rows: data.map((s) => {
-                        return {
-                            student: s.account.lastName + ' ' + s.account.firstName.substring(0, 1) + '. ' + s.account.middleName.substring(0, 1) + '.',
+                setStudents(data.sort())
+                JournalService.getJournalInfo(id).then((data) => {
+                    setInfo(data)
+                    data.sort((a, b) => {
+                        return new Date(b.date).getUTCDate() - new Date(a.date).getUTCDate();
+                    }).map((i) => {
+                        let date = new Date(i.date).getDate() + '.' + new Date(i.date).getMonth() + '.' + new Date(i.date).getFullYear()
+                        let isDates = columns.map((item) => {
+                            return item.key
+                        })
+                        if (!isDates.includes(i.date)) {
+                            let oldColumns = columns
+                            oldColumns.push({key: i.date, name: date, enabled: true})
+                            setColumns(oldColumns)
                         }
+                        setRows(data)
                     })
                 })
             })
         })
-        JournalService.getJournalInfo(this.id).then((data) => {
-            this.setState({ info: data })
-            this.setState({
-                columns: [
-                    { key: "student", name: "Учащийся", editable: false },
-                ]
-            })
-            data.sort((a, b) => {
-                return new Date(b.date).getUTCDate() - new Date(a.date).getUTCDate();
-            }).map((i) => {
-                let date = new Date(i.date).getDate() + '.' + new Date(i.date).getMonth() + '.' + new Date(i.date).getFullYear()
-                this.setState({
-                    columns: [...this.state.columns, { key: i.date, name: date, enabled: true }]
-                })
-                this.setState({rows: data})
-            })
+        if (!columns.map((item) => item.key).includes("student")) {
+            columns.push({key: "student", name: "Учащийся", editable: false})
+        }
+    }, [])
+
+    const createData = (s, items) => {
+        const name = {
+            mark: s.account.lastName + ' ' + s.account.firstName.substring(0, 1).toUpperCase() + '. ' + s.account.middleName.substring(0, 1).toUpperCase() + '.'
+        }
+        let response = [s.id, name]
+        items.forEach((item) => {
+            response.push(item)
         })
+        return response
     }
 
-    
+    const useStyles = makeStyles({
+        table: {
+            minWidth: 650,
+        },
+    });
+    const classes = useStyles();
 
-    onGridRowsUpdated({ fromRow, toRow, updated }) {
-        this.setState(state => {
-            const rows = state.rows.slice();
-            for (let i = fromRow; i <= toRow; i++) {
-                rows[i] = { ...rows[i], ...updated };
-            }
-            return { rows };
-        });
-    };
+    const rr = students.map((s) => {
+        let items = []
+        if (info !== null) {
+            columns.forEach((c) => {
+                if (info.find((item) => item.student.id === s.id)) {
+                    items.push(info.find((item) => item.student.id === s.id))
+                } else {
+                    items.push({
+                        mark: ""
+                    })
+                }
+            })
+        }
+        return createData(s, items)
+    })
 
-    addColumn() {
+    const addColumn = () => {
         let d = new Date()
-        const name = d.getDate() + '.' + d.getMonth() + '.' + d.getFullYear()
-        this.setState({
-            columns: [...this.state.columns, { key: 'date_', name: name, editable: true }]
+        const name = d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear()
+        let isDates = columns.map((item) => {
+            return item.name
         })
+        if (!isDates.includes(name)) {
+            let oldColumns = columns
+            oldColumns.push({key: name, name: name, enabled: true})
+            setColumns(oldColumns)
+        }
     }
 
-    render() {
-        return (
-            <Scrollbars height="100%">
-                <Flex flexDirection="column" h="100%">
-                    <Flex p="5" flexDirection="column" alignItems="center" h="90%" justifyContent="start" w="100%" pt="40px">
-                        <Box d="flex" justifyContent="space-between" w="100%" mb="5">
-                            <Text color="gray">Преподаватель: {this.state.journal?.teacher?.lastName + ' ' + this.state.journal?.teacher?.firstName.substring(0, 1) + '. ' + this.state.journal?.teacher?.middleName.substring(0, 1) + '.'}</Text>
-                            <Text color="gray">Дата последнего обновления: {this.state.journal?.lastUpdated}</Text>
-                        </Box>
-                        <ReactDataGrid
-                            minHeight={660}
-                            style="border: 1px solid red"
-                            width="100vw"
-                            h="100%"
-                            columns={this.state.columns}
-                            rowGetter={i => this.state.rows.indexOf(i)}
-                            rowsCount={this.state.rows.length}
-                            onGridRowsUpdated={this.onGridRowsUpdated}
-                            enableCellSelect
-                        />
-                    </Flex>
-                    <Flex justifyContent="space-around">
-                        <Button colorScheme="telegram" variant="ghost" onClick={this.addColumn}>
-                            Добавить занятие
-                    </Button>
-                        <Button colorScheme="green" variant="ghost" onClick={this.addColumn}>
-                            Сохранить
-                    </Button>
-                    </Flex>
-                </Flex>
-            </Scrollbars>
-        )
+    const setMark = (id, mark) => {
+        if(mark.markType !== undefined){
+            alert(mark.markType)
+        }
     }
+
+    const tCell = (r, student_id) => {
+        var rows = [];
+        for (var i = 1; i < r.length - 1; i++) {
+            rows.push(<TableCell onClick={() => setMark(student_id, r[i])}>{r[i].mark}</TableCell>);
+        }
+        return rows
+    }
+
+    return (
+        <Scrollbars height="100%">
+            <Flex flexDirection="column" h="100%">
+                <Flex p="5" flexDirection="column" alignItems="center" h="100%" justifyContent="start" w="100%"
+                      pt="40px">
+                    <Box d="flex" justifyContent="space-between" w="100%" mb="5" height="50px">
+                        <Text
+                            color="gray">Преподаватель: {journal?.teacher?.lastName + ' ' + journal?.teacher?.firstName.substring(0, 1) + '. ' + journal?.teacher?.middleName.substring(0, 1) + '.'}</Text>
+                        <Text color="gray">Дата последнего обновления: {journal?.lastUpdated}</Text>
+                    </Box>
+                    <TableContainer>
+                        <Table stickyHeader aria-label="sticky table" className={classes.table} size="small"
+                               aria-label="a dense table">
+                            <TableHead>
+                                <TableRow>
+                                    {columns.map((c) => (
+                                        <TableCell>{c.name}</TableCell>
+                                    ))}
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {rr.map((r) => (
+                                    <TableRow key={r[0]}>
+                                        {tCell(r, r[0])}
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Flex>
+                <Flex justifyContent="space-around" height="50px">
+                    <Button colorScheme="telegram" variant="ghost" onClick={addColumn}>
+                        Добавить занятие
+                    </Button>
+                    <Button colorScheme="green" variant="ghost" onClick={addColumn}>
+                        Сохранить
+                    </Button>
+                </Flex>
+            </Flex>
+        </Scrollbars>
+    )
 }
 
 export default Journal
