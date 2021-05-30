@@ -10,40 +10,45 @@ class JournalService {
             headers: authHeader(),
             params: params
         }).then((response) => {
-            
             return response.data
         })
     }
 
-    getAllJournals(){
+    getAllJournals() {
         return axios.get('/journals', {headers: authHeader()}).then((response) => {
             return response.data
         })
     }
 
-    getJournalInfo(id){
+    getJournalInfo(id) {
         return axios.get('/journals/' + id, {headers: authHeader()}).then((response) => {
             return response.data
         })
     }
 
-    getJournalById(id){
+    getJournalById(id) {
         return axios.get('/journals/', {headers: authHeader(), params: {journalId: id}}).then((response) => {
             return response.data
         })
     }
 
-    addJournal(journal){
+    addJournal(journal) {
         return axios.post('/journals', journal, {headers: authHeader()}).then((response) => {
             return response.data
         })
     }
 
     deleteByIds(ids) {
-        console.log(ids)
-        axios.delete('/journals', { headers: authHeader(), params: { ids: ids.toString() } })
+        axios.delete('/journals', {headers: authHeader(), params: {ids: ids.toString()}})
+    }
+
+    addJournalInfo(id, data) {
+        return axios.post('/journals/' + id, data, {
+            headers: authHeader()
+        }).then((response) => {
+            return response.data
+        })
     }
 }
-
 
 export default new JournalService()
