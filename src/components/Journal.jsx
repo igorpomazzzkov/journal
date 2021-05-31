@@ -173,7 +173,7 @@ const AddJournalInfo = (props) => {
         journalId: 0,
         mark: 9,
         markType: "",
-        date: Date(),
+        date: null,
         desc: ""
     }
 
@@ -208,6 +208,7 @@ const AddJournalInfo = (props) => {
 
     const addMark = () => {
         info.journalId = props.journalId
+        console.log(info)
         JournalService.addJournalInfo(info.journalId, info).then((response) => {
             console.log(response)
         })
