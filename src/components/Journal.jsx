@@ -1,80 +1,58 @@
 import React, {useEffect, useState} from 'react'
-import {Box, Button, Flex, Text, Textarea, useDisclosure} from '@chakra-ui/react'
+import {Box, Flex, Text, Textarea, useDisclosure} from '@chakra-ui/react'
 import {Scrollbars} from 'react-custom-scrollbars'
 import JournalService from '../service/journal-service'
 import StudentService from '../service/student-service'
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import {makeStyles} from '@material-ui/core/styles';
+import AddIcon from '@material-ui/icons/Add'
+import Button from '@material-ui/core/Button'
+import Dialog from '@material-ui/core/Dialog'
+import DialogActions from '@material-ui/core/DialogActions'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import IconButton from '@material-ui/core/IconButton'
+import TextField from '@material-ui/core/TextField'
+import Tooltip from '@material-ui/core/Tooltip'
+import {KeyboardDatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers"
+import Autocomplete from '@material-ui/lab/Autocomplete'
 import 'date-fns'
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import TextField from "@material-ui/core/TextField";
-import Tooltip from "@material-ui/core/Tooltip";
-import IconButton from "@material-ui/core/IconButton";
-import AddIcon from "@material-ui/icons/Add";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import {KeyboardDatePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
+import Loader from "./Loader";
 
 
 const Journal = () => {
 
     const [info, setInfo] = useState(null)
     const [journal, setJournal] = useState(null)
-    const [students, setStudents] = useState([])
-    const [columns, setColumns] = useState([])
+    const [students, setStudents] = useState(null)
+    const [columns, setColumns] = useState(['Учащиеся'])
     const [rows, setRows] = useState([])
     const [id, setId] = useState(window.location.pathname.split('/').pop())
-    const {isOpen, onOpen, onClose} = useDisclosure()
-
-    const [modelStudent, setModelStudent] = useState(null)
-    const [modelMark, setModelMark] = useState(null)
-    const [modelMarkType, setModelMarkType] = useState(null)
-    const [modelData, setModelDate] = useState(new Date())
-
-    const [scrollBehavior, setScrollBehavior] = React.useState("inside")
 
     useEffect(() => {
         JournalService.getJournalById(id).then((response) => {
             setJournal(response)
             StudentService.getStudentsByGroupId(response.group.id).then((data) => {
                 setStudents(data.sort())
-                JournalService.getJournalInfo(id).then((data) => {
-                    setInfo(data)
-                    data.sort((a, b) => {
-                        return new Date(b.date).getUTCDate() - new Date(a.date).getUTCDate();
-                    }).map((i) => {
-                        let date = new Date(i.date).getDate() + '.' + (new Date(i.date).getMonth() + 1) + '.' + new Date(i.date).getFullYear()
-                        let isDates = columns.map((item) => {
-                            return item.key
-                        })
-                        if (!isDates.includes(i.date)) {
-                            let oldColumns = columns
-                            oldColumns.push({key: i.date, name: date, enabled: true})
-                            setColumns(oldColumns)
-                        }
-                        setRows(data)
+                JournalService.getHeader(id).then((response) => {
+                    response.map((res) => {
+                        columns.push(res)
                     })
+                })
+                JournalService.getCell(id, response.group.id).then((res) => {
+                    for (let key of Object.keys(res)) {
+                        let arr = []
+                        arr.push(key)
+                        for (let item of res[key]) {
+                            arr.push(item)
+                        }
+                        rows.push(arr)
+                    }
                 })
             })
         })
-        if (!columns.map((item) => item.key).includes("student")) {
-            columns.push({key: "student", name: "Учащийся", editable: false})
-        }
     }, [])
-
-    const createData = (s, items) => {
-        const name = {
-            mark: s.account.lastName + ' ' + s.account.firstName.substring(0, 1).toUpperCase() + '. ' + s.account.middleName.substring(0, 1).toUpperCase() + '.'
-        }
-        let response = [s.id, name]
-        items.forEach((item) => {
-            response.push(item)
-        })
-        return response
-    }
 
     const useStyles = makeStyles({
         table: {
@@ -83,47 +61,24 @@ const Journal = () => {
     });
     const classes = useStyles();
 
-    const rr = students.map((s) => {
-        let items = []
-        if (info !== null) {
-            columns.forEach((c) => {
-                if (info.find((item) => item.student.id === s.id)) {
-                    items.push(info.find((item) => item.student.id === s.id))
-                } else {
-                    items.push({
-                        mark: ""
-                    })
-                }
-            })
-        }
-        return createData(s, items)
-    })
-
-    const addColumn = () => {
-        let d = new Date()
-        const name = d.getDate() + '.' + (d.getMonth()) + '.' + d.getFullYear()
-        let isDates = columns.map((item) => {
-            return item.name
-        })
-        if (!isDates.includes(name)) {
-            let oldColumns = columns
-            oldColumns.push({key: name, name: name, enabled: true})
-            setColumns(oldColumns)
-        }
-    }
-
-    const setMark = (id, mark) => {
-        if (mark.markType !== undefined) {
-            alert(mark.date)
-        }
-    }
-
-    const tCell = (r, student_id) => {
+    const tCell = (r) => {
         var rows = [];
-        for (var i = 1; i < r.length - 1; i++) {
-            rows.push(<TableCell onClick={() => setMark(student_id, r[i])}>{r[i].mark}</TableCell>);
+        for (var i = 0; i < r.length; i++) {
+            rows.push(<TableCell>{r[i]}</TableCell>);
         }
         return rows
+    }
+
+    const tHeader = () => {
+        let rows = [];
+        for(let i = 0; i < columns.length; i++){
+            rows.push(<TableCell>{rows[i]}</TableCell>);
+        }
+        return rows
+    }
+
+    if (students !== null) {
+        return <Loader />
     }
 
     return (
@@ -140,19 +95,17 @@ const Journal = () => {
                         <AddJournalInfo students={students} journalId={journal?.id}/>
                     </Flex>
                     <TableContainer>
-                        <Table stickyHeader aria-label="sticky table" className={classes.table} size="small"
+                        <Table stickyHeader className={classes.table} size="small"
                                aria-label="a dense table">
                             <TableHead>
                                 <TableRow>
-                                    {columns.map((c) => (
-                                        <TableCell>{c.name}</TableCell>
-                                    ))}
+                                    {tHeader()}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {rr.map((r) => (
-                                    <TableRow key={r[0]}>
-                                        {tCell(r, r[0])}
+                                {rows.map((r, index) => (
+                                    <TableRow key={index}>
+                                        {tCell(r)}
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -208,9 +161,10 @@ const AddJournalInfo = (props) => {
 
     const addMark = () => {
         info.journalId = props.journalId
-        console.log(info)
         JournalService.addJournalInfo(info.journalId, info).then((response) => {
-            console.log(response)
+            if (response !== null) {
+                document.location.reload();
+            }
         })
     }
 
@@ -260,7 +214,7 @@ const AddJournalInfo = (props) => {
                         renderInput={(params) => <TextField {...params} label="Отметка"/>}
                     />
                     <br/>
-                    <Textarea placeholder="Описание для студента" onChange={descHandler}/>
+                    <Textarea placeholder="Сообщение для студента" onChange={descHandler}/>
                     <br/>
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                         <KeyboardDatePicker
