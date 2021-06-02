@@ -60,8 +60,7 @@ class JournalService {
 
     getCell(id, groupId) {
         return axios.get('/journals/' + id + '/cell', {
-            headers: authHeader(),
-            params: {groupId: groupId}
+            headers: authHeader()
         }).then((response) => {
             return response.data
         })

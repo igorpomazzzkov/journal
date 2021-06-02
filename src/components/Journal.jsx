@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {Box, Flex, Text, Textarea, useDisclosure} from '@chakra-ui/react'
+import {Box, Flex, Text, Textarea} from '@chakra-ui/react'
 import {Scrollbars} from 'react-custom-scrollbars'
 import JournalService from '../service/journal-service'
 import StudentService from '../service/student-service'
@@ -19,12 +19,9 @@ import Autocomplete from '@material-ui/lab/Autocomplete'
 import 'date-fns'
 import DateFnsUtils from '@date-io/date-fns';
 import {useHistory} from "react-router-dom";
-import Loader from "./Loader";
-
 
 const Journal = () => {
 
-    const [info, setInfo] = useState(null)
     const [journal, setJournal] = useState(null)
     const [students, setStudents] = useState([])
     const [columns, setColumns] = useState(['Учащиеся'])
@@ -32,33 +29,28 @@ const Journal = () => {
     const [id, setId] = useState(window.location.pathname.split('/').pop())
 
     useEffect(() => {
+        StudentService.getStudentsByJournalId(id).then((response) => {
+            setStudents(response)
+        })
+    }, [setStudents])
+
+    useEffect(() => {
         JournalService.getJournalById(id).then((response) => {
             setJournal(response)
-            StudentService.getStudentsByGroupId(response.group.id).then((data) => {
-                setStudents(data.sort())
-                JournalService.getHeader(id).then((response) => {
-                    response.map((res) => {
-                        columns.push(res)
-                    })
-                    console.log(columns)
-                })
-                JournalService.getCell(id, response.group.id).then((res) => {
-                    console.log(res)
-                    setRows(res)
-                })
-                JournalService.getCell(id, response.group.id).then((res) => {
-                    for (let key of Object.keys(res)) {
-                        let arr = []
-                        arr.push(key)
-                        for (let item of res[key]) {
-                            arr.push(item)
-                        }
-                        rows.push(arr)
-                    }
-                })
-            })
         })
-    }, [])
+    }, [setJournal])
+
+    useEffect(() => {
+        JournalService.getCell(id).then((res) => {
+            setRows(res)
+        })
+    }, [setRows])
+
+    useEffect(() => {
+        JournalService.getHeader(id).then((response) => {
+            setColumns(response)
+        })
+    }, [setColumns])
 
     const useStyles = makeStyles({
         table: {
@@ -66,26 +58,6 @@ const Journal = () => {
         },
     });
     const classes = useStyles();
-
-    const tCell = (r) => {
-        var rows = [];
-        for (var i = 0; i < r.length; i++) {
-            rows.push(<TableCell>{r[i]}</TableCell>);
-        }
-        return rows
-    }
-
-    const tHeader = () => {
-        let rows = [];
-        for(let i = 0; i < columns.length; i++){
-            rows.push(<TableCell>{rows[i]}</TableCell>);
-        }
-        return rows
-    }
-
-    if (students !== null) {
-        return <Loader />
-    }
 
     return (
         <Scrollbars height="100%">
@@ -105,15 +77,22 @@ const Journal = () => {
                                aria-label="a dense table">
                             <TableHead>
                                 <TableRow>
-                                    {tHeader()}
+                                    {columns?.map((item) => (
+                                        <TableCell>{item}</TableCell>
+                                    ))}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {rows.map((r, index) => (
-                                    <TableRow key={index}>
-                                        {tCell(r)}
-                                    </TableRow>
-                                ))}
+                                {rows.length > 0 ? (
+                                    rows?.map((r, index) => (
+                                        <TableRow key={index}>
+                                            {r.map((i) => (
+                                                <TableCell>{i}</TableCell>
+                                            ))}
+                                        </TableRow>
+                                    ))) : (
+                                    <p>No contents</p>
+                                )}
                             </TableBody>
                         </Table>
                     </TableContainer>

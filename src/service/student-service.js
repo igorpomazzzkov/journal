@@ -1,9 +1,18 @@
 import axios from '../api'
-import { authHeader } from './auth-header'
+import {authHeader} from './auth-header'
 
 class StudentService {
     getAllStudents() {
         return axios.get('/students', { headers: authHeader() }).then((response) => {
+            return response.data
+        })
+    }
+
+    getStudentsByJournalId(id){
+        return axios.get('/students', {
+            headers: authHeader(),
+            params: {journalId: id}
+        }).then((response) => {
             return response.data
         })
     }
