@@ -54,43 +54,9 @@ class Registration extends Component {
                         _focut={{ outline: "none" }}
                         focusBorderColor="transparent">
                         <Tab color="tomato" _selected={{ color: "white", bg: "tomato" }}
-                            __focut={{ outline: "none" }}>Учащийся</Tab>
-                        <Tab color="tomato" _selected={{ color: "white", bg: "tomato" }}
                             _focus={{ outline: "none" }}>Преподаватель</Tab>
                     </TabList>
                     <TabPanels>
-                        <TabPanel>
-                            <FormControl padding="0" id="lastname" mb="5">
-                                <Input margin="0" type="text" size="sm" focusBorderColor="dimgray"
-                                    placeholder="Фамилия" />
-                            </FormControl>
-                            <FormControl id="firstname" mb="5">
-                                <Input type="text" size="sm" focusBorderColor="dimgray" placeholder="Имя" />
-                            </FormControl>
-                            <FormControl id="middlename" mb="5">
-                                <Input type="text" size="sm" focusBorderColor="dimgray" placeholder="Отчество" />
-                            </FormControl>
-                            <FormControl id="group" mb="5">
-                                <Select placeholder="Выбери группу" size="sm">
-                                    {this.state.groups.map((group) =>
-                                        <option key={group.id}>{group.name}</option>
-                                    )}
-                                </Select>
-                            </FormControl>
-                            <FormControl id="email" mb="5">
-                                <Input type="email" size="sm" placeholder="Email" focusBorderColor="dimgray" />
-                            </FormControl>
-                            <FormControl id="mobile" mb="5">
-                                <InputGroup size="sm">
-                                    <InputLeftAddon children="+375" />
-                                    <Input type="number" focusBorderColor="dimgray"
-                                        placeholder="Мобильный телефон" />
-                                </InputGroup>
-                            </FormControl>
-                            <FormControl id="password" mb="5">
-                                <Input type="password" size="sm" placeholder="пароль" focusBorderColor="dimgray" />
-                            </FormControl>
-                        </TabPanel>
                         <TabPanel>
                             <FormControl id="lastname" mb="5">
                                 <Input type="text" size="sm" focusBorderColor="dimgray" placeholder="Фамилия" />

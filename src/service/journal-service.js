@@ -49,6 +49,23 @@ class JournalService {
             return response.data
         })
     }
+
+    getHeader(id) {
+        return axios.get('/journals/' + id + '/header', {
+            headers: authHeader()
+        }).then((response) => {
+            return response.data
+        })
+    }
+
+    getCell(id, groupId) {
+        return axios.get('/journals/' + id + '/cell', {
+            headers: authHeader(),
+            params: {groupId: groupId}
+        }).then((response) => {
+            return response.data
+        })
+    }
 }
 
 export default new JournalService()

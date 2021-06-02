@@ -17,6 +17,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import {KeyboardDatePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
+import {useHistory} from "react-router-dom";
 
 
 const Journal = () => {
@@ -24,7 +25,7 @@ const Journal = () => {
     const [info, setInfo] = useState(null)
     const [journal, setJournal] = useState(null)
     const [students, setStudents] = useState([])
-    const [columns, setColumns] = useState([])
+    const [columns, setColumns] = useState(['Учащиеся'])
     const [rows, setRows] = useState([])
     const [id, setId] = useState(window.location.pathname.split('/').pop())
     const {isOpen, onOpen, onClose} = useDisclosure()
@@ -41,40 +42,19 @@ const Journal = () => {
             setJournal(response)
             StudentService.getStudentsByGroupId(response.group.id).then((data) => {
                 setStudents(data.sort())
-                JournalService.getJournalInfo(id).then((data) => {
-                    setInfo(data)
-                    data.sort((a, b) => {
-                        return new Date(b.date).getUTCDate() - new Date(a.date).getUTCDate();
-                    }).map((i) => {
-                        let date = new Date(i.date).getDate() + '.' + (new Date(i.date).getMonth() + 1) + '.' + new Date(i.date).getFullYear()
-                        let isDates = columns.map((item) => {
-                            return item.key
-                        })
-                        if (!isDates.includes(i.date)) {
-                            let oldColumns = columns
-                            oldColumns.push({key: i.date, name: date, enabled: true})
-                            setColumns(oldColumns)
-                        }
-                        setRows(data)
+                JournalService.getHeader(id).then((response) => {
+                    response.map((res) => {
+                        columns.push(res)
                     })
+                    console.log(columns)
+                })
+                JournalService.getCell(id, response.group.id).then((res) => {
+                    console.log(res)
+                    setRows(res)
                 })
             })
         })
-        if (!columns.map((item) => item.key).includes("student")) {
-            columns.push({key: "student", name: "Учащийся", editable: false})
-        }
     }, [])
-
-    const createData = (s, items) => {
-        const name = {
-            mark: s.account.lastName + ' ' + s.account.firstName.substring(0, 1).toUpperCase() + '. ' + s.account.middleName.substring(0, 1).toUpperCase() + '.'
-        }
-        let response = [s.id, name]
-        items.forEach((item) => {
-            response.push(item)
-        })
-        return response
-    }
 
     const useStyles = makeStyles({
         table: {
@@ -83,47 +63,10 @@ const Journal = () => {
     });
     const classes = useStyles();
 
-    const rr = students.map((s) => {
-        let items = []
-        if (info !== null) {
-            columns.forEach((c) => {
-                if (info.find((item) => item.student.id === s.id)) {
-                    items.push(info.find((item) => item.student.id === s.id))
-                } else {
-                    items.push({
-                        mark: ""
-                    })
-                }
-            })
-        }
-        return createData(s, items)
-    })
-
-    const addColumn = () => {
-        let d = new Date()
-        const name = d.getDate() + '.' + (d.getMonth()) + '.' + d.getFullYear()
-        let isDates = columns.map((item) => {
-            return item.name
-        })
-        if (!isDates.includes(name)) {
-            let oldColumns = columns
-            oldColumns.push({key: name, name: name, enabled: true})
-            setColumns(oldColumns)
-        }
-    }
-
     const setMark = (id, mark) => {
         if (mark.markType !== undefined) {
             alert(mark.date)
         }
-    }
-
-    const tCell = (r, student_id) => {
-        var rows = [];
-        for (var i = 1; i < r.length - 1; i++) {
-            rows.push(<TableCell onClick={() => setMark(student_id, r[i])}>{r[i].mark}</TableCell>);
-        }
-        return rows
     }
 
     return (
@@ -140,21 +83,18 @@ const Journal = () => {
                         <AddJournalInfo students={students} journalId={journal?.id}/>
                     </Flex>
                     <TableContainer>
-                        <Table stickyHeader aria-label="sticky table" className={classes.table} size="small"
+                        <Table stickyHeader className={classes.table} size="small"
                                aria-label="a dense table">
                             <TableHead>
                                 <TableRow>
-                                    {columns.map((c) => (
-                                        <TableCell>{c.name}</TableCell>
-                                    ))}
+                                    {
+                                        columns.map((item) => {
+                                            <TableCell>{item}</TableCell>
+                                        })
+                                    }
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {rr.map((r) => (
-                                    <TableRow key={r[0]}>
-                                        {tCell(r, r[0])}
-                                    </TableRow>
-                                ))}
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -176,6 +116,8 @@ const AddJournalInfo = (props) => {
         date: null,
         desc: ""
     }
+
+    let history = useHistory()
 
     const markTypes = ["Лекция", "Лабораторная работа", "Семинар", "Практическая"]
     const marks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -208,9 +150,10 @@ const AddJournalInfo = (props) => {
 
     const addMark = () => {
         info.journalId = props.journalId
-        console.log(info)
         JournalService.addJournalInfo(info.journalId, info).then((response) => {
-            console.log(response)
+            if (response !== null) {
+                document.location.reload();
+            }
         })
     }
 
