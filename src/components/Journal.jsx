@@ -1,23 +1,25 @@
 import React, {useEffect, useState} from 'react'
-import {Box, Button, Flex, Text, Textarea, useDisclosure} from '@chakra-ui/react'
+import {Box, Flex, Text, Textarea, useDisclosure} from '@chakra-ui/react'
 import {Scrollbars} from 'react-custom-scrollbars'
 import JournalService from '../service/journal-service'
 import StudentService from '../service/student-service'
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import {makeStyles} from '@material-ui/core/styles';
+import AddIcon from '@material-ui/icons/Add'
+import Button from '@material-ui/core/Button'
+import Dialog from '@material-ui/core/Dialog'
+import DialogActions from '@material-ui/core/DialogActions'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import IconButton from '@material-ui/core/IconButton'
+import TextField from '@material-ui/core/TextField'
+import Tooltip from '@material-ui/core/Tooltip'
+import {KeyboardDatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers"
+import Autocomplete from '@material-ui/lab/Autocomplete'
 import 'date-fns'
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import TextField from "@material-ui/core/TextField";
-import Tooltip from "@material-ui/core/Tooltip";
-import IconButton from "@material-ui/core/IconButton";
-import AddIcon from "@material-ui/icons/Add";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import {KeyboardDatePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import {useHistory} from "react-router-dom";
+import Loader from "./Loader";
 
 
 const Journal = () => {
@@ -28,14 +30,6 @@ const Journal = () => {
     const [columns, setColumns] = useState(['Учащиеся'])
     const [rows, setRows] = useState([])
     const [id, setId] = useState(window.location.pathname.split('/').pop())
-    const {isOpen, onOpen, onClose} = useDisclosure()
-
-    const [modelStudent, setModelStudent] = useState(null)
-    const [modelMark, setModelMark] = useState(null)
-    const [modelMarkType, setModelMarkType] = useState(null)
-    const [modelData, setModelDate] = useState(new Date())
-
-    const [scrollBehavior, setScrollBehavior] = React.useState("inside")
 
     useEffect(() => {
         JournalService.getJournalById(id).then((response) => {
@@ -52,6 +46,16 @@ const Journal = () => {
                     console.log(res)
                     setRows(res)
                 })
+                JournalService.getCell(id, response.group.id).then((res) => {
+                    for (let key of Object.keys(res)) {
+                        let arr = []
+                        arr.push(key)
+                        for (let item of res[key]) {
+                            arr.push(item)
+                        }
+                        rows.push(arr)
+                    }
+                })
             })
         })
     }, [])
@@ -63,10 +67,24 @@ const Journal = () => {
     });
     const classes = useStyles();
 
-    const setMark = (id, mark) => {
-        if (mark.markType !== undefined) {
-            alert(mark.date)
+    const tCell = (r) => {
+        var rows = [];
+        for (var i = 0; i < r.length; i++) {
+            rows.push(<TableCell>{r[i]}</TableCell>);
         }
+        return rows
+    }
+
+    const tHeader = () => {
+        let rows = [];
+        for(let i = 0; i < columns.length; i++){
+            rows.push(<TableCell>{rows[i]}</TableCell>);
+        }
+        return rows
+    }
+
+    if (students !== null) {
+        return <Loader />
     }
 
     return (
@@ -87,14 +105,15 @@ const Journal = () => {
                                aria-label="a dense table">
                             <TableHead>
                                 <TableRow>
-                                    {
-                                        columns.map((item) => {
-                                            <TableCell>{item}</TableCell>
-                                        })
-                                    }
+                                    {tHeader()}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
+                                {rows.map((r, index) => (
+                                    <TableRow key={index}>
+                                        {tCell(r)}
+                                    </TableRow>
+                                ))}
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -203,7 +222,7 @@ const AddJournalInfo = (props) => {
                         renderInput={(params) => <TextField {...params} label="Отметка"/>}
                     />
                     <br/>
-                    <Textarea placeholder="Описание для студента" onChange={descHandler}/>
+                    <Textarea placeholder="Сообщение для студента" onChange={descHandler}/>
                     <br/>
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                         <KeyboardDatePicker
